@@ -1,0 +1,143 @@
+-- Executar manualmente quando desejar
+-- Foco: otimização visual estática
+-- Não monitora alterações futuras
+-- Não reaplica configurações automaticamente
+
+local Lighting = game:GetService("Lighting")
+local StarterGui = game:GetService("StarterGui")
+
+local function hasHumanoidAncestor(instance)
+	local current = instance
+
+	while current do
+		if current:IsA("Model") and current:FindFirstChildOfClass("Humanoid") then
+			return true
+		end
+
+		current = current.Parent
+	end
+
+	return false
+end
+
+-- =========================
+-- CHAT E PLAYER LIST
+-- =========================
+
+pcall(function()
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
+end)
+
+pcall(function()
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
+end)
+
+-- =========================
+-- LIGHTING / ATMOSFERA
+-- =========================
+
+Lighting.GlobalShadows = false
+Lighting.FogStart = 100000
+Lighting.FogEnd = 100000
+Lighting.Brightness = 1
+
+for _, obj in ipairs(Lighting:GetChildren()) do
+	if
+		obj:IsA("Atmosphere")
+		or obj:IsA("BloomEffect")
+		or obj:IsA("BlurEffect")
+		or obj:IsA("ColorCorrectionEffect")
+		or obj:IsA("DepthOfFieldEffect")
+		or obj:IsA("SunRaysEffect")
+		or obj:IsA("Sky")
+	then
+		obj:Destroy()
+	end
+end
+
+-- =========================
+-- ÁGUA
+-- =========================
+
+pcall(function()
+	local terrain = workspace.Terrain
+
+	terrain.WaterReflectance = 0
+	terrain.WaterTransparency = 1
+	terrain.WaterWaveSize = 0
+	terrain.WaterWaveSpeed = 0
+end)
+
+-- =========================
+-- OBJETOS ESTÁTICOS
+-- =========================
+
+for _, obj in ipairs(workspace:GetDescendants()) do
+
+	-- Ignorar qualquer coisa ligada a Humanoid
+	if hasHumanoidAncestor(obj) then
+		continue
+	end
+
+	-- Partes físicas
+	if obj:IsA("BasePart") then
+		obj.Material = Enum.Material.SmoothPlastic
+		obj.Reflectance = 0
+		obj.CastShadow = false
+	end
+
+	-- Texturas
+	if obj:IsA("Texture") then
+		obj:Destroy()
+	end
+
+	-- Decals
+	if obj:IsA("Decal") then
+		obj:Destroy()
+	end
+
+	-- SurfaceAppearance
+	if obj:IsA("SurfaceAppearance") then
+		obj:Destroy()
+	end
+
+	-- Partículas
+	if obj:IsA("ParticleEmitter") then
+		obj.Enabled = false
+	end
+
+	-- Trails
+	if obj:IsA("Trail") then
+		obj.Enabled = false
+	end
+
+	-- Fumaça
+	if obj:IsA("Smoke") then
+		obj.Enabled = false
+	end
+
+	-- Fogo
+	if obj:IsA("Fire") then
+		obj.Enabled = false
+	end
+
+	-- Faíscas
+	if obj:IsA("Sparkles") then
+		obj.Enabled = false
+	end
+
+	-- Feixes
+	if obj:IsA("Beam") then
+		obj.Enabled = false
+	end
+
+	-- Luzes
+	if obj:IsA("PointLight")
+		or obj:IsA("SpotLight")
+		or obj:IsA("SurfaceLight")
+	then
+		obj.Enabled = false
+	end
+end
+
+print("Otimização visual aplicada.")
